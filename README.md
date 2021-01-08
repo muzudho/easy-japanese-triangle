@@ -1,0 +1,2 @@
+# easy-japanese-triangle
+Triangle.
