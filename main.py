@@ -142,6 +142,35 @@ def board_to_unique(board):
     return unique
 
 
+def unique_to_board(unique, n):
+    """
+    Example:
+
+    n = 4
+
+    0123
+    456.
+    78..
+    9...
+
+    (1) 4,3,2,1 の長さの文字列と、1,2,3,4 の長さの空白が交互に現れると考える。 Example: 4,1,3,2,2,3,1,4
+    (2) m の長さの文字列と、 m-n の長さの空白が、 m を 1つずつ減らしながら 交互に現れる。
+    (3) m を、(n-i) と言い換えると、 0 <= i <= n と昇順にできる。
+    """
+    board = []
+    a = 0
+    for i in range(0, n):
+        m = n - i
+        for _j in range(0, m):
+            ch = unique[a]
+            a += 1
+            board.append(int(ch))
+        for _k in range(0, i):
+            board.append(0)
+    # print(f"board len={len(board)}")
+    return board
+
+
 def fill_square(board, dir, sq, n):
     if board[sq] == Piece.RIGHT.value:
         board[sq] = Piece.BOTH.value
@@ -198,7 +227,7 @@ def calculate_unique(n):
 print("start")
 
 # Elemental number
-n = 3
+n = 4
 print(f"n={n}")
 
 patterns = set()
@@ -209,6 +238,7 @@ for i in range(0, 1000):
 
 for pattern in patterns:
     print(f"pattern={pattern}")
+    print_board(unique_to_board(pattern, n), n)
 
 print(f"patterns number={len(patterns)}")
 
