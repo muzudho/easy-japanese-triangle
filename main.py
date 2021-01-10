@@ -170,41 +170,46 @@ def fill_line(board, dir, e, n):
     fill_square(board, dir, 0, n)
 
 
+def calculate_unique(n):
+    board = create_board(n)
+    # print_board(board, n)
+
+    # Top row.
+    # print("e=1")
+    fill_line(board, Direction.RIGHT.value, 1, n)
+    # print_board(board, n)
+
+    # Leftest column.
+    # print(f"e={n}")
+    fill_line(board, Direction.DOWN.value, n, n)
+    # print_board(board, n)
+
+    for e in range(2, n):
+        # print(f"e={e}")
+        dir = random_dir()
+        fill_line(board, dir, e, n)
+        # print_board(board, n)
+
+    unique = board_to_unique(board)
+    # print(f"unique={unique}")
+    return unique
+
+
 print("start")
 
 # Elemental number
 n = 3
 print(f"n={n}")
 
-board = create_board(n)
-print_board(board, n)
+patterns = set()
 
-# Top row.
-print("e=1")
-fill_line(board, Direction.RIGHT.value, 1, n)
-print_board(board, n)
+for i in range(0, 1000):
+    unique = calculate_unique(n)
+    patterns.add(unique)
 
-# Leftest column.
-print(f"e={n}")
-fill_line(board, Direction.DOWN.value, n, n)
-print_board(board, n)
+for pattern in patterns:
+    print(f"pattern={pattern}")
 
-for e in range(2, n):
-    print(f"e={e}")
-    dir = random_dir()
-    fill_line(board, dir, e, n)
-    print_board(board, n)
-
-print(f"unique={board_to_unique(board)}")
-
-"""
-board[sq] = 1
-
-answers = set()
-answers.add(11)
-for answer in answers:
-    print(f"answer={answer}")
-
-"""
+print(f"patterns number={len(patterns)}")
 
 print("finished")
