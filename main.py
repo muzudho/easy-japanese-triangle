@@ -134,6 +134,21 @@ def print_board(board, n):
         print("")  # New line.
 
 
+def fill_square(board, dir, sq, n):
+    if board[sq] == Piece.RIGHT.value:
+        board[sq] = Piece.BOTH.value
+    elif board[sq] == Piece.DOWN.value:
+        board[sq] = Piece.BOTH.value
+    elif board[sq] == Piece.BOTH.value:
+        board[sq] = Piece.BOTH.value
+    else:
+        if dir == Piece.RIGHT.value:
+            board[sq] = Piece.RIGHT.value
+        else:
+            board[sq] = Piece.DOWN.value
+        pass
+
+
 def fill_line(board, dir, e, n):
     # x = starting_x(e, n)
     sq = sq_of_e(e, n)
@@ -142,11 +157,11 @@ def fill_line(board, dir, e, n):
     step, end_sq = get_step_and_end_sq(dir, e, n)
     print(f"step={step} end_sq={end_sq}")
     while sq != end_sq:
-        if dir == Piece.RIGHT.value:
-            board[sq] = Piece.RIGHT.value
-        else:
-            board[sq] = Piece.DOWN.value
+        fill_square(board, dir, sq, n)
         sq += step
+
+    # Root.
+    fill_square(board, dir, 0, n)
 
 
 print("start")
