@@ -1,4 +1,5 @@
 from enum import Enum
+from random import randrange
 
 
 class Piece(Enum):
@@ -43,24 +44,50 @@ def starting_sq(index, n):
     return (index+1) * (n-1)
 
 
+def random_dir():
+    """
+    0 <- .
+         |
+         v
+         1
+    """
+
+    return randrange(2)
+
+
+def create_board(n):
+    """Create a board.
+
+    Example:
+    n=3
+
+    0 0 0
+    0 0 0
+    0 0 0
+    """
+    return [0] * (n**2)
+
+
+def print_board(board, n):
+    for row in range(0, n):
+        for column in range(0, n):
+            print(f"{board[row*n+column]} ", end="")
+        print("")  # New line.
+    pass
+
+
 print("start")
 
 # Elemental number
 n = 3
 
-# Create a board.
-# n^2
-#
-# Example:
-# n=3
-#
-# 0 0 0
-# 0 0 0
-# 0 0 0
-board = [0] * (n**2)
+board = create_board(n)
 
 for index in range(0, n):
     print(f"n={n} index={index} stargin sq={starting_sq(index,n)}")
+    dir = random_dir()
+    print(f"dir={dir}")
+    print_board(board, n)
     pass
 
 """
