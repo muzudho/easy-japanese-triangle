@@ -176,33 +176,45 @@ def unique_to_board(unique, n):
 
 def fill_square(board, dir, sq, n):
     if board[sq] == Piece.RIGHT.value:
-        board[sq] = Piece.BOTH.value
+        if dir == Piece.RIGHT.value:
+            pass
+        else:
+            board[sq] = Piece.BOTH.value
     elif board[sq] == Piece.DOWN.value:
-        board[sq] = Piece.BOTH.value
+        if dir == Piece.RIGHT.value:
+            board[sq] = Piece.BOTH.value
+        else:
+            pass
     elif board[sq] == Piece.BOTH.value:
-        board[sq] = Piece.BOTH.value
+        pass
     else:
         if dir == Piece.RIGHT.value:
             board[sq] = Piece.RIGHT.value
         else:
             board[sq] = Piece.DOWN.value
-        pass
 
 
-def fill_line(board, dir, e, n):
+def fill_ray(board, dir, e, n):
+    """光線を飛ばすように、盤上の升を塗り替えます。"""
     sq = sq_of_e(e, n)
-    print(f"(fill_line) e={e} sq_of_e={sq} dir={dir}")
+    # print(f"(fill_ray) e={e} sq_of_e={sq} dir={dir}")
     step, end_sq = get_step_and_end_sq(dir, e, n)
-    print(f"(fill_line) step={step} end_sq={end_sq}")
-    while sq != end_sq:
+    # print(f"(fill_ray) step={step} end_sq={end_sq}")
+
+    collided = False
+    while True:
+        if board[sq] != Piece.NONE.value or sq == end_sq:
+            collided = True
+
         fill_square(board, dir, sq, n)
         sq += step
 
-    # Root.
-    fill_square(board, dir, 0, n)
+        # 後判定
+        if collided:
+            break
 
-    print("(fill_line) check.")
-    print_board(board, n)
+    # print("(fill_ray) check.")
+    # print_board(board, n)
 
 
 def fill_out_of_triangle(board, n):
@@ -237,24 +249,25 @@ def calculate_unique(n):
     # print_board(board, n)
 
     # Top row.
-    # print("e=1")
-    fill_line(board, Direction.RIGHT.value, 1, n)
+    fill_ray(board, Direction.RIGHT.value, 1, n)
+    # print(f"(Ray) e=1 dir={Direction.RIGHT.value}")
     # print_board(board, n)
 
     # Leftest column.
-    # print(f"e={n}")
-    fill_line(board, Direction.DOWN.value, n, n)
+    fill_ray(board, Direction.DOWN.value, n, n)
+    # print(f"(Ray) e={n} dir={Direction.DOWN.value}")
     # print_board(board, n)
 
     for e in range(2, n):
-        # print(f"e={e}")
         dir = random_dir()
-        fill_line(board, dir, e, n)
+        fill_ray(board, dir, e, n)
+        # print(f"(Ray) e={e} dir={dir}")
+        # print_board(board, n)
 
-    print("check 1.")
-    print_board(board, n)
+    # print("check 1.")
+    # print_board(board, n)
     unique = board_to_unique(board)
-    print(f"unique ={unique}")
+    # print(f"unique ={unique}")
     return unique
 
 
@@ -266,7 +279,7 @@ print(f"n={n}")
 
 patterns = set()
 
-for i in range(0, 1):
+for i in range(0, 30):
     unique = calculate_unique(n)
     patterns.add(unique)
 
