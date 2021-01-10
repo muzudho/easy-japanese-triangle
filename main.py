@@ -125,7 +125,8 @@ def random_dir():
 
 
 class Board:
-    value = [0]
+    _n = 0
+    value = []
 
     def __init__(self, n):
         """Create a board.
@@ -137,10 +138,42 @@ class Board:
         0 0 4
         0 4 4
         """
+        self._n = n
         self.value = [0] * (n**2)
-        self.fill_out_of_triangle(n)
+        self.fill_out_of_triangle()
 
-    def fill_out_of_triangle(self, n):
+    @staticmethod
+    def from_unique(unique, n):
+        """
+        Example:
+
+        n = 4
+
+        0123
+        456.
+        78..
+        9...
+
+        (1) 4,3,2,1 の長さの文字列と、1,2,3,4 の長さの空白が交互に現れると考える。 Example: 4,1,3,2,2,3,1,4
+        (2) m の長さの文字列と、 m-n の長さの空白が、 m を 1つずつ減らしながら 交互に現れる。
+        (3) m を、(n-i) と言い換えると、 0 <= i <= n と昇順にできる。
+        """
+        obj = Board(0)
+        obj.value = []
+        a = 0
+        for i in range(0, n):
+            m = n - i
+            for _j in range(0, m):
+                ch = unique[a]
+                a += 1
+                obj.value.append(int(ch))
+            for _k in range(0, i):
+                obj.value.append(Piece.OUT_OF_TRIANGLE.value)
+        # print(f"board len={len(obj.value)}")
+        obj.n = n
+        return obj
+
+    def fill_out_of_triangle(self):
         """
         Example:
 
@@ -155,6 +188,7 @@ class Board:
         (2) m の長さの文字列と、 m-n の長さの文字列が、 m を 1つずつ減らしながら 交互に現れる。
         (3) m を、(n-i) と言い換えると、 0 <= i <= n と昇順にできる。
         """
+        n = self._n
         a = 0
         for i in range(0, n):
             m = n - i
@@ -163,14 +197,37 @@ class Board:
             for _k in range(0, i):
                 self.value[a] = Piece.OUT_OF_TRIANGLE.value
                 a += 1
-        # print(f"board len={len(board)}")
+        # print(f"board len={len(self.value)}")
 
+    def fill_ray(self, dir, e):
+        """光線を飛ばすように、盤上の升を塗り替えます。"""
+        n = self._n
+        sq = sq_of_e(e, n)
+        # print(f"(fill_ray) e={e} sq_of_e={sq} dir={dir}")
+        step, end_sq = get_step_and_end_sq(dir, e, n)
+        # print(f"(fill_ray) step={step} end_sq={end_sq}")
 
-def print_board(board, n):
-    for row in range(0, n):
-        for column in range(0, n):
-            print(f"{board[row*n+column]} ", end="")
-        print("")  # New line.
+        collided = False
+        while True:
+            if self.value[sq] != Piece.NONE.value or sq == end_sq:
+                collided = True
+
+            fill_square(self.value, dir, sq, n)
+            sq += step
+
+            # 後判定
+            if collided:
+                break
+
+        # print("(fill_ray) check.")
+        # board_obj.print()
+
+    def print(self):
+        n = self._n
+        for row in range(0, n):
+            for column in range(0, n):
+                print(f"{self.value[row*n+column]} ", end="")
+            print("")  # New line.
 
 
 def board_to_unique(board):
@@ -179,35 +236,6 @@ def board_to_unique(board):
         if board[sq] != Piece.OUT_OF_TRIANGLE.value:
             unique += str(board[sq])
     return unique
-
-
-def unique_to_board(unique, n):
-    """
-    Example:
-
-    n = 4
-
-    0123
-    456.
-    78..
-    9...
-
-    (1) 4,3,2,1 の長さの文字列と、1,2,3,4 の長さの空白が交互に現れると考える。 Example: 4,1,3,2,2,3,1,4
-    (2) m の長さの文字列と、 m-n の長さの空白が、 m を 1つずつ減らしながら 交互に現れる。
-    (3) m を、(n-i) と言い換えると、 0 <= i <= n と昇順にできる。
-    """
-    board = []
-    a = 0
-    for i in range(0, n):
-        m = n - i
-        for _j in range(0, m):
-            ch = unique[a]
-            a += 1
-            board.append(int(ch))
-        for _k in range(0, i):
-            board.append(Piece.OUT_OF_TRIANGLE.value)
-    # print(f"board len={len(board)}")
-    return board
 
 
 def fill_square(board, dir, sq, n):
@@ -230,43 +258,20 @@ def fill_square(board, dir, sq, n):
             board[sq] = Piece.DOWN.value
 
 
-def fill_ray(board, dir, e, n):
-    """光線を飛ばすように、盤上の升を塗り替えます。"""
-    sq = sq_of_e(e, n)
-    # print(f"(fill_ray) e={e} sq_of_e={sq} dir={dir}")
-    step, end_sq = get_step_and_end_sq(dir, e, n)
-    # print(f"(fill_ray) step={step} end_sq={end_sq}")
-
-    collided = False
-    while True:
-        if board[sq] != Piece.NONE.value or sq == end_sq:
-            collided = True
-
-        fill_square(board, dir, sq, n)
-        sq += step
-
-        # 後判定
-        if collided:
-            break
-
-    # print("(fill_ray) check.")
-    # print_board(board, n)
-
-
 def calculate_unique(n):
     board_obj = Board(n)
     board = board_obj.value
-    # print_board(board, n)
+    # board_obj.print()
 
     # Top row.
-    fill_ray(board, Direction.RIGHT.value, 1, n)
+    board_obj.fill_ray(Direction.RIGHT.value, 1)
     # print(f"(Ray) e=1 dir={Direction.RIGHT.value}")
-    # print_board(board, n)
+    # board_obj.print()
 
     # Leftest column.
-    fill_ray(board, Direction.DOWN.value, n, n)
+    board_obj.fill_ray(Direction.DOWN.value, n)
     # print(f"(Ray) e={n} dir={Direction.DOWN.value}")
-    # print_board(board, n)
+    # board_obj.print()
 
     e_list = list(range(2, n))
     # print(f"e_list1={e_list}")
@@ -274,12 +279,12 @@ def calculate_unique(n):
     # print(f"e_list2={e_list}")
     for e in e_list:
         dir = random_dir()
-        fill_ray(board, dir, e, n)
+        board_obj.fill_ray(dir, e)
         # print(f"(Ray) e={e} dir={dir}")
-        # print_board(board, n)
+        # board_obj.print()
 
     # print("check 1.")
-    # print_board(board, n)
+    # board_obj.print()
     unique = board_to_unique(board)
     # print(f"unique ={unique}")
     return unique
@@ -289,7 +294,7 @@ print("start")
 
 # Elemental number
 n = 10
-triout = 3000000
+triout = 9000000
 # e  = patterns | Triout  | Time
 #  2 = 1        |      10 |
 #  3 = 2        |      20 |
@@ -305,7 +310,8 @@ triout = 3000000
 # 10 = 4771 ?   |  600000 | 1:52 sec
 # 10 = 4813 ?   |  900000 | 2:59 sec
 # 10 = 4851 ?   | 3000000 | 9:43 sec
-# 10 =
+# 10 = 4848 ?   | 3000000 | 9:35 sec
+# 10 =          | 9000000 |
 print(f"n={n} triout={triout}")
 
 start_time = time.time()
@@ -322,7 +328,7 @@ print_time_lapsed(time_lapsed)
 """
 for pattern in patterns:
     print(f"pattern={pattern}")
-    print_board(unique_to_board(pattern, n), n)
+    board.from_unique(pattern, n).print()
 """
 
 print(f"patterns number={len(patterns)}")
