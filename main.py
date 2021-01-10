@@ -134,6 +134,14 @@ def print_board(board, n):
         print("")  # New line.
 
 
+def board_to_unique(board):
+    unique = ""
+    for sq in range(0, len(board)):
+        if board[sq] != 0:
+            unique += str(board[sq])
+    return unique
+
+
 def fill_square(board, dir, sq, n):
     if board[sq] == Piece.RIGHT.value:
         board[sq] = Piece.BOTH.value
@@ -150,12 +158,10 @@ def fill_square(board, dir, sq, n):
 
 
 def fill_line(board, dir, e, n):
-    # x = starting_x(e, n)
     sq = sq_of_e(e, n)
-    # print(f"e={e} sq_of_e={sq} starting_x={x}")
-    print(f"e={e} sq_of_e={sq} dir={dir}")
+    # print(f"e={e} sq_of_e={sq} dir={dir}")
     step, end_sq = get_step_and_end_sq(dir, e, n)
-    print(f"step={step} end_sq={end_sq}")
+    # print(f"step={step} end_sq={end_sq}")
     while sq != end_sq:
         fill_square(board, dir, sq, n)
         sq += step
@@ -173,43 +179,25 @@ print(f"n={n}")
 board = create_board(n)
 print_board(board, n)
 
-print(f"Top row:")
+# Top row.
+print("e=1")
 fill_line(board, Direction.RIGHT.value, 1, n)
 print_board(board, n)
 
-print(f"Leftest column:")
+# Leftest column.
+print(f"e={n}")
 fill_line(board, Direction.DOWN.value, n, n)
 print_board(board, n)
 
-for e in range(0, n):
+for e in range(2, n):
+    print(f"e={e}")
     dir = random_dir()
     fill_line(board, dir, e, n)
     print_board(board, n)
-    pass
+
+print(f"unique={board_to_unique(board)}")
 
 """
-# Square number
-#
-# 0 1
-# 2 3
-#
-# Starting square number
-sq = 0
-
-# Random search
-#
-# . --> 0
-# |
-# v
-# 1
-#
-dir = randrange(2)
-
-if dir == 0:
-    sq += 1
-else:
-    sq += 2
-
 board[sq] = 1
 
 answers = set()
