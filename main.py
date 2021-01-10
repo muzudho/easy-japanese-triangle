@@ -1,5 +1,5 @@
 from enum import Enum
-from random import randrange
+from random import randrange, shuffle
 
 
 class Piece(Enum):
@@ -258,7 +258,11 @@ def calculate_unique(n):
     # print(f"(Ray) e={n} dir={Direction.DOWN.value}")
     # print_board(board, n)
 
-    for e in range(2, n):
+    e_list = list(range(2, n))
+    # print(f"e_list1={e_list}")
+    shuffle(e_list)
+    # print(f"e_list2={e_list}")
+    for e in e_list:
         dir = random_dir()
         fill_ray(board, dir, e, n)
         # print(f"(Ray) e={e} dir={dir}")
