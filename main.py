@@ -278,12 +278,20 @@ def calculate_unique(n):
 print("start")
 
 # Elemental number
-n = 4
-print(f"n={n}")
+n = 2
+triout = 3
+# e = paths
+# 2 = 1
+# 3 = 2
+# 4 = 5
+# 5 = 14
+# 6 = 42
+# 7 = 132
+print(f"n={n} triout={triout}")
 
 patterns = set()
 
-for i in range(0, 30):
+for i in range(0, triout):
     unique = calculate_unique(n)
     patterns.add(unique)
 
