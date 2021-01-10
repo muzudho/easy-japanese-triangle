@@ -1,5 +1,14 @@
 from enum import Enum
 from random import randrange, shuffle
+import time
+
+
+def print_time_lapsed(sec):
+    mins = sec // 60
+    sec = sec % 60
+    hours = mins // 60
+    mins = mins % 60
+    print(f"Time Lapsed = {int(hours)}:{int(mins)}:{sec}")
 
 
 class Piece(Enum):
@@ -278,26 +287,41 @@ def calculate_unique(n):
 print("start")
 
 # Elemental number
-n = 2
-triout = 3
-# e = paths
-# 2 = 1
-# 3 = 2
-# 4 = 5
-# 5 = 14
-# 6 = 42
-# 7 = 132
+n = 10
+triout = 3000000
+# e  = patterns | Triout  | Time
+#  2 = 1        |      10 |
+#  3 = 2        |      20 |
+#  4 = 5        |      50 |
+#  5 = 14       |     100 |
+#  6 = 42       |    1000 |
+#  7 = 132      |   20000 |
+#  8 = 429 ?    |  300000 |
+#  9 = 1427 ?   |  300000 | 50 sec
+# 10 = 4701 ?   |  300000 | 1:01 sec
+# 10 = 4680 ?   |  300000 |
+# 10 = 4777 ?   |  600000 | 1:53 sec
+# 10 = 4771 ?   |  600000 | 1:52 sec
+# 10 = 4813 ?   |  900000 | 2:59 sec
+# 10 =          | 3000000 |
 print(f"n={n} triout={triout}")
 
+start_time = time.time()
 patterns = set()
 
 for i in range(0, triout):
     unique = calculate_unique(n)
     patterns.add(unique)
 
+end_time = time.time()
+time_lapsed = end_time - start_time
+print_time_lapsed(time_lapsed)
+
+"""
 for pattern in patterns:
     print(f"pattern={pattern}")
     print_board(unique_to_board(pattern, n), n)
+"""
 
 print(f"patterns number={len(patterns)}")
 
