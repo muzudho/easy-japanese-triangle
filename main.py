@@ -124,19 +124,46 @@ def random_dir():
     return randrange(2)
 
 
-def create_board(n):
-    """Create a board.
+class Board:
+    value = [0]
 
-    Example:
-    n=3
+    def __init__(self, n):
+        """Create a board.
 
-    0 0 0
-    0 0 0
-    0 0 0
-    """
-    board = [0] * (n**2)
-    fill_out_of_triangle(board, n)
-    return board
+        Example:
+        n=3
+
+        0 0 0
+        0 0 4
+        0 4 4
+        """
+        self.value = [0] * (n**2)
+        self.fill_out_of_triangle(n)
+
+    def fill_out_of_triangle(self, n):
+        """
+        Example:
+
+        n = 4
+
+        ....
+        ...x
+        ..xx
+        .xxx
+
+        (1) 4,3,2,1 の長さの文字列と、1,2,3,4 の長さの文字列が交互に現れると考える。 Example: 4,1,3,2,2,3,1,4
+        (2) m の長さの文字列と、 m-n の長さの文字列が、 m を 1つずつ減らしながら 交互に現れる。
+        (3) m を、(n-i) と言い換えると、 0 <= i <= n と昇順にできる。
+        """
+        a = 0
+        for i in range(0, n):
+            m = n - i
+            for _j in range(0, m):
+                a += 1
+            for _k in range(0, i):
+                self.value[a] = Piece.OUT_OF_TRIANGLE.value
+                a += 1
+        # print(f"board len={len(board)}")
 
 
 def print_board(board, n):
@@ -226,35 +253,9 @@ def fill_ray(board, dir, e, n):
     # print_board(board, n)
 
 
-def fill_out_of_triangle(board, n):
-    """
-    Example:
-
-    n = 4
-
-    ....
-    ...x
-    ..xx
-    .xxx
-
-    (1) 4,3,2,1 の長さの文字列と、1,2,3,4 の長さの文字列が交互に現れると考える。 Example: 4,1,3,2,2,3,1,4
-    (2) m の長さの文字列と、 m-n の長さの文字列が、 m を 1つずつ減らしながら 交互に現れる。
-    (3) m を、(n-i) と言い換えると、 0 <= i <= n と昇順にできる。
-    """
-    a = 0
-    for i in range(0, n):
-        m = n - i
-        for _j in range(0, m):
-            a += 1
-        for _k in range(0, i):
-            board[a] = Piece.OUT_OF_TRIANGLE.value
-            a += 1
-    # print(f"board len={len(board)}")
-    return board
-
-
 def calculate_unique(n):
-    board = create_board(n)
+    board_obj = Board(n)
+    board = board_obj.value
     # print_board(board, n)
 
     # Top row.
@@ -303,7 +304,8 @@ triout = 3000000
 # 10 = 4777 ?   |  600000 | 1:53 sec
 # 10 = 4771 ?   |  600000 | 1:52 sec
 # 10 = 4813 ?   |  900000 | 2:59 sec
-# 10 =          | 3000000 |
+# 10 = 4851 ?   | 3000000 | 9:43 sec
+# 10 =
 print(f"n={n} triout={triout}")
 
 start_time = time.time()
