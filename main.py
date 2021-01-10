@@ -92,13 +92,13 @@ def get_step_and_end_sq(dir, e, n):
     b.a.
     ....
 
-    b = int(a / n)
+    b = a - c
     c = a mod n
 
     """
     sq = sq_of_e(e, n)
     if dir == Direction.RIGHT.value:
-        return -1, int(sq/n)
+        return -1, sq - sq % n
     else:
         return -n, sq % n
 
@@ -188,15 +188,18 @@ def fill_square(board, dir, sq, n):
 
 def fill_line(board, dir, e, n):
     sq = sq_of_e(e, n)
-    # print(f"e={e} sq_of_e={sq} dir={dir}")
+    print(f"(fill_line) e={e} sq_of_e={sq} dir={dir}")
     step, end_sq = get_step_and_end_sq(dir, e, n)
-    # print(f"step={step} end_sq={end_sq}")
+    print(f"(fill_line) step={step} end_sq={end_sq}")
     while sq != end_sq:
         fill_square(board, dir, sq, n)
         sq += step
 
     # Root.
     fill_square(board, dir, 0, n)
+
+    print("(fill_line) check.")
+    print_board(board, n)
 
 
 def calculate_unique(n):
@@ -217,10 +220,11 @@ def calculate_unique(n):
         # print(f"e={e}")
         dir = random_dir()
         fill_line(board, dir, e, n)
-        # print_board(board, n)
 
+    print("check 1.")
+    print_board(board, n)
     unique = board_to_unique(board)
-    # print(f"unique={unique}")
+    print(f"unique ={unique}")
     return unique
 
 
@@ -232,7 +236,7 @@ print(f"n={n}")
 
 patterns = set()
 
-for i in range(0, 1000):
+for i in range(0, 1):
     unique = calculate_unique(n)
     patterns.add(unique)
 
