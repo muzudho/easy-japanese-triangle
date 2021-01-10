@@ -212,7 +212,7 @@ class Board:
             if self.value[sq] != Piece.NONE.value or sq == end_sq:
                 collided = True
 
-            fill_square(self.value, dir, sq, n)
+            self.fill_square(dir, sq, n)
             sq += step
 
             # 後判定
@@ -220,7 +220,7 @@ class Board:
                 break
 
         # print("(fill_ray) check.")
-        # board_obj.print()
+        # self.print()
 
     def print(self):
         n = self._n
@@ -229,49 +229,46 @@ class Board:
                 print(f"{self.value[row*n+column]} ", end="")
             print("")  # New line.
 
+    def to_unique(self):
+        unique = ""
+        for sq in range(0, len(self.value)):
+            if self.value[sq] != Piece.OUT_OF_TRIANGLE.value:
+                unique += str(self.value[sq])
+        return unique
 
-def board_to_unique(board):
-    unique = ""
-    for sq in range(0, len(board)):
-        if board[sq] != Piece.OUT_OF_TRIANGLE.value:
-            unique += str(board[sq])
-    return unique
-
-
-def fill_square(board, dir, sq, n):
-    if board[sq] == Piece.RIGHT.value:
-        if dir == Piece.RIGHT.value:
+    def fill_square(self, dir, sq, n):
+        if self.value[sq] == Piece.RIGHT.value:
+            if dir == Piece.RIGHT.value:
+                pass
+            else:
+                self.value[sq] = Piece.BOTH.value
+        elif self.value[sq] == Piece.DOWN.value:
+            if dir == Piece.RIGHT.value:
+                self.value[sq] = Piece.BOTH.value
+            else:
+                pass
+        elif self.value[sq] == Piece.BOTH.value:
             pass
         else:
-            board[sq] = Piece.BOTH.value
-    elif board[sq] == Piece.DOWN.value:
-        if dir == Piece.RIGHT.value:
-            board[sq] = Piece.BOTH.value
-        else:
-            pass
-    elif board[sq] == Piece.BOTH.value:
-        pass
-    else:
-        if dir == Piece.RIGHT.value:
-            board[sq] = Piece.RIGHT.value
-        else:
-            board[sq] = Piece.DOWN.value
+            if dir == Piece.RIGHT.value:
+                self.value[sq] = Piece.RIGHT.value
+            else:
+                self.value[sq] = Piece.DOWN.value
 
 
 def calculate_unique(n):
-    board_obj = Board(n)
-    board = board_obj.value
-    # board_obj.print()
+    board = Board(n)
+    # board.print()
 
     # Top row.
-    board_obj.fill_ray(Direction.RIGHT.value, 1)
+    board.fill_ray(Direction.RIGHT.value, 1)
     # print(f"(Ray) e=1 dir={Direction.RIGHT.value}")
-    # board_obj.print()
+    # board.print()
 
     # Leftest column.
-    board_obj.fill_ray(Direction.DOWN.value, n)
+    board.fill_ray(Direction.DOWN.value, n)
     # print(f"(Ray) e={n} dir={Direction.DOWN.value}")
-    # board_obj.print()
+    # board.print()
 
     e_list = list(range(2, n))
     # print(f"e_list1={e_list}")
@@ -279,13 +276,13 @@ def calculate_unique(n):
     # print(f"e_list2={e_list}")
     for e in e_list:
         dir = random_dir()
-        board_obj.fill_ray(dir, e)
+        board.fill_ray(dir, e)
         # print(f"(Ray) e={e} dir={dir}")
-        # board_obj.print()
+        # board.print()
 
     # print("check 1.")
-    # board_obj.print()
-    unique = board_to_unique(board)
+    # board.print()
+    unique = board.to_unique()
     # print(f"unique ={unique}")
     return unique
 
@@ -328,7 +325,7 @@ print_time_lapsed(time_lapsed)
 """
 for pattern in patterns:
     print(f"pattern={pattern}")
-    board.from_unique(pattern, n).print()
+    Board.from_unique(pattern, n).print()
 """
 
 print(f"patterns number={len(patterns)}")
