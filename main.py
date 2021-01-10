@@ -48,72 +48,7 @@ class Direction(Enum):
     DOWN = 1
 
 
-def starting_x(e, n):
-    """Example:
-
-    n = 4
-
-    ...a
-    ..b.
-    .c..
-    d...
-
-    f(e) = sq
-    f(1) =  3 ... a
-    f(2) =  2 ... b
-    f(3) =  1 ... c
-    f(4) =  0 ... d
-    """
-    # `e` is 1 origin.
-    return n-(e-1)
-
-
-def sq_of_e(e, n):
-    """Starting square.
-    Example:
-
-    n = 4
-
-    ...a
-    ..b.
-    .c..
-    d...
-
-    f(e) = sq
-    f(1) =  3 ... a
-    f(2) =  6 ... b
-    f(3) =  9 ... c
-    f(4) = 12 ... d
-    """
-
-    # `e` is 1 origin.
-    # `sq` is 0 origin.
-    return e * (n-1)
-
-
-def get_step_and_end_sq(dir, e, n):
-    """Ending square.
-    Example:
-
-    n = 4
-
-    ..c.
-    ....
-    b.a.
-    ....
-
-    b = a - c
-    c = a mod n
-
-    """
-    sq = sq_of_e(e, n)
-    if dir == Direction.RIGHT.value:
-        return -1, sq - sq % n
-    else:
-        return -n, sq % n
-
-
-def random_dir():
+def random_direction():
     """
     0 <- .
          |
@@ -121,7 +56,10 @@ def random_dir():
          1
     """
 
-    return randrange(2)
+    if randrange(2):
+        return Direction.RIGHT
+    else:
+        return Direction.DOWN
 
 
 class Board:
@@ -202,9 +140,9 @@ class Board:
     def fill_ray(self, dir, e):
         """光線を飛ばすように、盤上の升を塗り替えます。"""
         n = self._n
-        sq = sq_of_e(e, n)
+        sq = Board.sq_of_e(e, n)
         # print(f"(fill_ray) e={e} sq_of_e={sq} dir={dir}")
-        step, end_sq = get_step_and_end_sq(dir, e, n)
+        step, end_sq = Board.get_step_and_end_sq(dir, e, n)
         # print(f"(fill_ray) step={step} end_sq={end_sq}")
 
         collided = False
@@ -212,7 +150,7 @@ class Board:
             if self.value[sq] != Piece.NONE.value or sq == end_sq:
                 collided = True
 
-            self.fill_square(dir, sq, n)
+            self.fill_square(dir, sq)
             sq += step
 
             # 後判定
@@ -236,7 +174,7 @@ class Board:
                 unique += str(self.value[sq])
         return unique
 
-    def fill_square(self, dir, sq, n):
+    def fill_square(self, dir, sq):
         if self.value[sq] == Piece.RIGHT.value:
             if dir == Piece.RIGHT.value:
                 pass
@@ -255,36 +193,93 @@ class Board:
             else:
                 self.value[sq] = Piece.DOWN.value
 
+    @staticmethod
+    def starting_x(e, n):
+        """Example:
 
-def calculate_unique(n):
-    board = Board(n)
-    # board.print()
+        n = 4
 
-    # Top row.
-    board.fill_ray(Direction.RIGHT.value, 1)
-    # print(f"(Ray) e=1 dir={Direction.RIGHT.value}")
-    # board.print()
+        ...a
+        ..b.
+        .c..
+        d...
 
-    # Leftest column.
-    board.fill_ray(Direction.DOWN.value, n)
-    # print(f"(Ray) e={n} dir={Direction.DOWN.value}")
-    # board.print()
+        f(e) = sq
+        f(1) =  3 ... a
+        f(2) =  2 ... b
+        f(3) =  1 ... c
+        f(4) =  0 ... d
+        """
+        # `e` is 1 origin.
+        return n-(e-1)
 
-    e_list = list(range(2, n))
-    # print(f"e_list1={e_list}")
-    shuffle(e_list)
-    # print(f"e_list2={e_list}")
-    for e in e_list:
-        dir = random_dir()
-        board.fill_ray(dir, e)
-        # print(f"(Ray) e={e} dir={dir}")
-        # board.print()
+    @staticmethod
+    def sq_of_e(e, n):
+        """Starting square.
+        Example:
 
-    # print("check 1.")
-    # board.print()
-    unique = board.to_unique()
-    # print(f"unique ={unique}")
-    return unique
+        n = 4
+
+        ...a
+        ..b.
+        .c..
+        d...
+
+        f(e) = sq
+        f(1) =  3 ... a
+        f(2) =  6 ... b
+        f(3) =  9 ... c
+        f(4) = 12 ... d
+        """
+
+        # `e` is 1 origin.
+        # `sq` is 0 origin.
+        return e * (n-1)
+
+    @staticmethod
+    def get_step_and_end_sq(dir, e, n):
+        """Ending square.
+        Example:
+
+        n = 4
+
+        ..c.
+        ....
+        b.a.
+        ....
+
+        b = a - c
+        c = a mod n
+
+        """
+        sq = Board.sq_of_e(e, n)
+        if dir == Direction.RIGHT.value:
+            return -1, sq - sq % n
+        else:
+            return -n, sq % n
+
+    def fill_full_rays(self):
+        n = self._n
+
+        # Top row.
+        self.value.fill_ray(Direction.RIGHT.value, 1)
+        # print(f"(Ray) e=1 dir={Direction.RIGHT.value}")
+        # self.value.print()
+
+        # Leftest column.
+        self.value.fill_ray(Direction.DOWN.value, n)
+        # print(f"(Ray) e={n} dir={Direction.DOWN.value}")
+        # self.value.print()
+
+        e_list = list(range(2, n))
+        # print(f"e_list1={e_list}")
+        shuffle(e_list)
+        # print(f"e_list2={e_list}")
+        for e in e_list:
+            direction = random_direction()
+            self.value.fill_ray(direction.value, e)
+            # print(f"(Ray) e={e} dir={dir}")
+            # self.value.print()
 
 
 print("start")
@@ -315,7 +310,16 @@ start_time = time.time()
 patterns = set()
 
 for i in range(0, triout):
-    unique = calculate_unique(n)
+    board = Board(n)
+    # board.print()
+
+    board.fill_full_rays()
+
+    # print("check 1.")
+    # board.print()
+    unique = board.to_unique()
+    # print(f"unique ={unique}")
+
     patterns.add(unique)
 
 end_time = time.time()
